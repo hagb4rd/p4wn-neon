@@ -1,0 +1,91 @@
+/* p4wn - cyberpunk neon, monochrome green. Classic look: p4wn-classic.css */
+.p4wn-wrapper, .p4wn-status, .p4wn-controls {
+  --neon: #39ff14;                 /* signature green */
+  --lime: #c8ff9f;                 /* palest green: white pieces, hints */
+  --neon-dim: #1f8f0c;
+  --neon-soft: rgba(57, 255, 20, .55);
+  --bg: #030803;                   /* near-black with a green cast */
+  --sq-light: #2c8a22;             /* board: two shades of green */
+  --sq-dark:  #0d3d12;
+  --ink: #021706;                  /* black pieces: deepest green */
+  font-family: "JetBrains Mono", "Fira Code", "SF Mono", Consolas, "DejaVu Sans Mono", monospace;
+  color: var(--neon);
+}
+.p4wn-wrapper { display: flex; gap: 16px; align-items: flex-start;
+  --p4wn-sq: min(var(--p4wn-max-sq, 48px), calc((100vw - 28px) / 8)); }   /* never wider than the screen */
+
+/* board */
+.p4wn-board {
+  display: grid; grid-template-columns: repeat(8, var(--p4wn-sq)); grid-auto-rows: var(--p4wn-sq);
+  border: 2px solid var(--neon); background: var(--bg); user-select: none;
+  box-shadow: 0 0 6px var(--neon), 0 0 24px var(--neon-soft);
+}
+.p4wn-square {
+  display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer;
+  font-size: calc(var(--p4wn-sq) * .78); line-height: 1;
+  font-family: "Noto Sans Symbols 2", "Segoe UI Symbol", "DejaVu Sans", "Apple Symbols", serif;
+  transition: box-shadow .12s; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+.p4wn-light { background: var(--sq-light); }
+.p4wn-dark  { background: var(--sq-dark); }
+@media (hover: hover) { .p4wn-square:hover { box-shadow: inset 0 0 0 2px var(--neon-dim), inset 0 0 14px rgba(57, 255, 20, .35); } }
+
+/* pieces: white = pale lime core + neon glow; black = deepest green + neon outline */
+.p4wn-white { color: var(--lime); text-shadow: 0 0 3px var(--neon), 0 0 10px var(--neon), 0 0 2px #000; }
+.p4wn-black { color: var(--ink); -webkit-text-stroke: 1.5px var(--neon);
+              text-shadow: 0 0 6px var(--neon-soft); }
+
+/* highlights (all green) */
+.p4wn-last { box-shadow: inset 0 0 0 3px rgba(200, 255, 159, .45); }
+.p4wn-selected, .p4wn-selected:hover {
+  box-shadow: inset 0 0 0 3px var(--neon), inset 0 0 22px rgba(200, 255, 159, .6);
+}
+.p4wn-target::after {
+  content: ""; position: absolute; width: 24%; height: 24%; border-radius: 50%;
+  background: var(--lime); box-shadow: 0 0 8px var(--neon), 0 0 16px var(--neon-soft);
+  pointer-events: none;
+}
+.p4wn-target.p4wn-white::after, .p4wn-target.p4wn-black::after {   /* capture: ring */
+  width: 86%; height: 86%; background: none; border: 2px solid var(--lime);
+}
+
+/* move log */
+.p4wn-log {
+  width: 11em; height: calc(var(--p4wn-sq) * 8); overflow: auto; white-space: pre; font-size: 13px;
+  padding: 6px 0; border: 1px solid var(--neon-dim); background: rgba(3, 8, 3, .9);
+  box-shadow: 0 0 10px rgba(57, 255, 20, .2); scrollbar-width: thin; scrollbar-color: var(--neon-dim) var(--bg);
+}
+.p4wn-log-move { padding: 1px 8px; cursor: pointer; color: var(--neon-dim); }
+.p4wn-log-move:hover { background: rgba(57, 255, 20, .15); color: var(--lime); text-shadow: 0 0 6px var(--neon); }
+
+/* status line with a blinking cursor */
+.p4wn-status {
+  margin: 12px 0 8px; font-size: 15px; letter-spacing: .08em; text-transform: uppercase;
+  text-shadow: 0 0 6px var(--neon);
+}
+.p4wn-status::before { content: "> "; color: var(--neon-dim); }
+.p4wn-status::after  { content: "\2588"; margin-left: 4px; animation: p4wn-blink 1.1s steps(1) infinite; }
+@keyframes p4wn-blink { 50% { opacity: 0; } }
+
+/* controls */
+.p4wn-controls { display: flex; flex-wrap: wrap; gap: 8px; max-width: 36em; }
+.p4wn-control-button {
+  font: inherit; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; cursor: pointer;
+  color: var(--neon); background: var(--bg); padding: 6px 12px; border: 1px solid var(--neon-dim);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  transition: color .12s, background .12s; touch-action: manipulation;
+}
+.p4wn-control-button:hover, .p4wn-control-button:focus-visible {
+  background: var(--neon); color: var(--ink); outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p4wn-status::after { animation: none; }
+  .p4wn-square, .p4wn-control-button { transition: none; }
+}
+@media (pointer: coarse) { .p4wn-control-button { min-height: 40px; padding: 8px 14px; font-size: 13px; } }
+@media (max-width: 620px) {
+  .p4wn-wrapper { flex-direction: column; gap: 10px; }
+  .p4wn-log { width: calc(var(--p4wn-sq) * 8 + 4px); height: 7em; box-sizing: border-box; }
+  .p4wn-controls { justify-content: center; }
+}
